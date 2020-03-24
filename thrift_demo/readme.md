@@ -1,11 +1,4 @@
-## thrift
-
-### 1.Thrift Info
-- [官网](http://thrift.apache.org/)
-- [git](https://github.com/apache/thrift)
-- [tutorial](https://github.com/apache/thrift/tree/master/tutorial)
-
-### 2.The demo
+### thrift demo
 关键命令 `thrift -r --gen <language> <Thrift filename>`
 #### cpp
 1. 在'shared.thrift'和'tutorial.thrift'中定义数据传输的类型，支持基本类型和复杂的类型。
