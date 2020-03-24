@@ -6,7 +6,7 @@
 - [tutorial](https://github.com/apache/thrift/tree/master/tutorial)
 
 ### 2.use for 
-- 相同语言，不同语言，进程间通信。
+- 相同语言，不同语言，不同平台，不同进程间通信。
 - 可以一对一、一对多
 
 ### 3.demo
