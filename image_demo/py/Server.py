@@ -2,44 +2,47 @@ import glob
 import sys
 sys.path.append('../gen-py')
 
-from dataflow import Classification
+from dataflow import classify
 from dataflow.ttypes import InvalidOperation
 
-from shared.ttypes import SharedStruct, Image
+from shared.ttypes import SharedStruct, Image, Classification
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 
-class ClassificationHandler:
+class classifyHandler:
     def __init__(self):
         self.log = {}
 
-    def ping(self):
-        print('ping()')
-
-    def Run(self, im):
+    def Classify(self, im):
         print("c x w x h->",im.channel, im.width, im.height)
-        print("im.image", im.image)
-        print("im.image type->", type(im.image))
+        print("im.data", im.data)
+        print("im.data type->", type(im.data))
         log = SharedStruct()
         log.key = 0
         log.value = 'err'
         self.log[1] = log
 
-        return [1,2,3,4,5]
+        return Classification(classes=[1,2,3,4,5], probs=[0.1,0.2,0.3,0.4,0.5])
 
     def getStruct(self, key):
         print('getStruct(%d)' % (key))
         return self.log[key]
 
-    def zip(self):
-        print('zip()')
+    def test_throws(self, number):
+        print("test throws")
+        if number>10:
+            x = InvalidOperation()
+            x.whatOp = number
+            x.why = "Test invalid operation"
+            raise x
+        return number
 
 if __name__ == '__main__':
-    handler = ClassificationHandler()
-    processor = Classification.Processor(handler)
+    handler = classifyHandler()
+    processor = classify.Processor(handler)
     transport = TSocket.TServerSocket(host='127.0.0.1', port=9090)
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()

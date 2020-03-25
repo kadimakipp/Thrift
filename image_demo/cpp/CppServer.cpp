@@ -32,7 +32,7 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "Classification.h"
+#include "classify.h"
 
 using namespace std;
 using namespace apache::thrift;
@@ -44,47 +44,56 @@ using namespace apache::thrift::server;
 using namespace dataflow;
 using namespace shared;
 
-class ClassificationHandler : public ClassificationIf{
+class classifyHandler : public classifyIf{
 public:
-    ClassificationHandler()=default;
+    classifyHandler()=default;
 
-    void ping() override {cout<<"ping"<<endl;}
-    void zip() override { cout << "zip()" << endl; }
+    int32_t test_throws(const int32_t number) override {
+    // Your implementation goes here
+        printf("test_throws\n");
+        std::cout<<"param number->"<<number<<std::endl;
+        if(number>10)
+        {
+            InvalidOperation io;
+            io.whatOp = number;
+            io.why = "Test invalid operation";
+            throw io;
+        }
+
+        return number;
+    }
 
     void getStruct(SharedStruct& ret, const int32_t logid) override {
         cout << "getStruct(" << logid << ")" << endl;
         ret = log[logid];
     }
 
-    void Run( ::shared::classes& _return, const  ::shared::Image& im) override{
+    void Classify( ::shared::Classification& _return, const  ::shared::Image& im) override{
         cout<<"Run(Image)"<<std::endl;
         cout<<"Image info: c x w x h->";
         printf("%d x %d x %d\n", im.channel,im.width, im.height);
-        for(auto i: im.image)
+        for(auto i: im.data)
             std::cout<<"server->"<<int(i)<<std::endl;
         
+        Classification classes;
+        classes.classes = std::vector<int16_t>(5,1);
+        classes.probs = std::vector<double>(5, 0.01);
+        _return = classes;
+
         SharedStruct ss;
         ss.key = 1;
         ss.value = "error flag";
         log[0] = ss;
-        std::vector<int16_t> a(5,1);
-        _return = a;
-
-        // InvalidOperation io;
-        // io.whatOp = 1;
-        // io.why = "Test";
-        // throw io;
-
     }
 protected:
     map<int32_t, SharedStruct> log;
 };
 
 
-class ClassificationCloneFactory : virtual public ClassificationIfFactory{
+class classifyCloneFactory : virtual public classifyIfFactory{
 public:
-    ~ClassificationCloneFactory() override = default;
-    ClassificationIf* getHandler(const ::apache::thrift::TConnectionInfo& connInfo) override
+    ~classifyCloneFactory() override = default;
+    classifyIf* getHandler(const ::apache::thrift::TConnectionInfo& connInfo) override
     {
     std::shared_ptr<TSocket> sock = std::dynamic_pointer_cast<TSocket>(connInfo.transport);
     cout << "Incoming connection\n";
@@ -92,7 +101,7 @@ public:
     cout << "\tPeerHost: "    << sock->getPeerHost() << "\n";
     cout << "\tPeerAddress: " << sock->getPeerAddress() << "\n";
     cout << "\tPeerPort: "    << sock->getPeerPort() << "\n";
-    return new ClassificationHandler;
+    return new classifyHandler;
     }
     void releaseHandler( ::shared::SharedServiceIf* handler) override {
         delete handler;
@@ -102,7 +111,7 @@ public:
 
 int main(){
     TThreadedServer server(
-    std::make_shared<ClassificationProcessorFactory>(std::make_shared<ClassificationCloneFactory>()),
+    std::make_shared<classifyProcessorFactory>(std::make_shared<classifyCloneFactory>()),
     std::make_shared<TServerSocket>(9090), //port
     std::make_shared<TBufferedTransportFactory>(),
     std::make_shared<TBinaryProtocolFactory>());

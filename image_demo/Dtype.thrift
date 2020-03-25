@@ -15,18 +15,23 @@ struct Image{
     1: i16 height
     2: i16 width
     3: i8 channel
-    4: list<i8> image
+    4: list<i8> data
 }
-typedef list<i16> classes
+typedef list<i16> categories
+typedef list<double> probabilitise
 
+struct Classification {
+    1: categories classes
+    2: probabilitise probs
+}
 
 typedef list<double> bbox
-
 typedef list<bbox> bboxes
 
 struct Detection {
-    1: classes class_num
-    2: bboxes  bb
+    1: categories classes
+    2: probabilitise probs
+    3: bboxes  bb
 }
 
 struct SharedStruct {
