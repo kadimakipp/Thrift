@@ -10,7 +10,7 @@
 #else
 #include <opencv2/core.hpp>
 #endif
-
+#include "ktimer.h"
 using namespace std;
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
@@ -31,7 +31,7 @@ int main()
 #ifdef IMageTest
     cv::Mat img = cv::imread("1584428668870.jpg");
 #else
-    cv::Mat img = cv::Mat::zeros(100,120,CV_8UC3);
+    cv::Mat img = cv::Mat::zeros(1200,1920,CV_8UC3);
     for(int y=0;y<img.rows;y++)
         for(int x=0;x<img.cols;x++)
         {
@@ -41,6 +41,8 @@ int main()
             img.at<cv::Vec3b>(y,x)[2] = value;
         }
 #endif
+    kipp::StopWatch stop_watch;
+    //stop_watch.restart();
     Image im;
     im.height = img.rows;
     im.width = img.cols;
@@ -49,12 +51,19 @@ int main()
     unsigned int imtotal = img.total()*img.channels();
     im.data = std::string(imtotal, 0);
     memcpy((void *)im.data.data(), img.data, imtotal*sizeof(uchar));
-
+    
+    std::cout<<"memcpy "<<stop_watch.elapsed()<<" ms"<<std::endl;
+    
     try{
         transport->open();
         Classification result;
+        stop_watch.restart();
         client.Classify(result, im);
         std::cout<<"Classify result"<<std::endl;
+        
+        std::cout<<"send image and recever "<<stop_watch.elapsed()<<" ms"<<std::endl;
+        stop_watch.stop();
+        
         for(auto i: result.classes)
             std::cout<<"classes: "<<i<<std::endl;
         for(auto i: result.probs)

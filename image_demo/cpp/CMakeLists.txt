@@ -9,14 +9,14 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 #add_definitions(-DIMageTest)
 
-add_executable(Server CppServer.cpp)
+add_executable(Server CppServer.cpp ktimer.h)
 target_link_libraries(Server 
         gencpp
         ${OpenCV_LIBS})
 target_compile_options(Server ${WXN})
 
 
-add_executable(Client CppClient.cpp)
+add_executable(Client CppClient.cpp ktimer.h)
 target_link_libraries(Client 
         gencpp
         ${OpenCV_LIBS})

@@ -33,7 +33,7 @@
 #include <sstream>
 
 #include "classify.h"
-
+#include "ktimer.h"
 #ifdef IMageTest
 #include <opencv2/opencv.hpp>
 #else
@@ -74,6 +74,7 @@ public:
     }
 
     void Classify( ::shared::Classification& _return, const  ::shared::Image& im) override{
+        kipp::StopWatch stop_watch;
         cout<<"Run(Image)"<<std::endl;
         cout<<"Image info: c x w x h->";
         printf("%d x %d x %d\n", im.channel,im.width, im.height);
@@ -86,6 +87,7 @@ public:
 #ifdef IMageTest
         cv::imwrite("recever.jpg", img);
 #else
+        bool check_data = false;
         for(int y=0;y<img.rows;y++)
             for(int x=0;x<img.cols;x++)
             {
@@ -93,11 +95,15 @@ public:
                 if((img.at<cv::Vec3b>(y,x)[0] == value)&&
                 (img.at<cv::Vec3b>(y,x)[1] == value)&&
                 (img.at<cv::Vec3b>(y,x)[2] == value))
-                    std::cout<<"right"<<std::endl;
+                    check_data = true;
                 else{
-                    std::cout<<"error"<<std::endl;
+                    check_data = false;
                 }
             }
+        if(check_data)
+            std::cout<<"right"<<std::endl;
+        else
+            std::cout<<"error"<<std::endl;
 #endif
         Classification classes;
         classes.classes = std::vector<int16_t>(5,1);
@@ -108,6 +114,7 @@ public:
         ss.key = 1;
         ss.value = "error flag";
         log[1] = ss;
+        std::cout<<"Server time "<<stop_watch.elapsed()<<" ms"<<std::endl;
     }
 protected:
     map<int32_t, SharedStruct> log;
