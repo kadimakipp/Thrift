@@ -83,7 +83,7 @@ public:
         SharedStruct ss;
         ss.key = 1;
         ss.value = "error flag";
-        log[0] = ss;
+        log[1] = ss;
     }
 protected:
     map<int32_t, SharedStruct> log;

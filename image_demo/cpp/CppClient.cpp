@@ -56,7 +56,7 @@ int main()
         }
 
         SharedStruct ss;
-        client.getStruct(ss, 0);
+        client.getStruct(ss, 1);
         cout << "Received log: " << ss << endl;
 
         transport->close();
