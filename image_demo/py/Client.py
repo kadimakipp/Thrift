@@ -10,7 +10,8 @@ from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
-
+import numpy as np
+import cv2
 def main():
     # Make socket
     transport = TSocket.TSocket('localhost', 9090)
@@ -27,9 +28,18 @@ def main():
     # Connect!
     transport.open()
 
-    im = Image(height=10, width=20, channel=3, data = [11,22,33,44,55])
+    img = np.zeros((100,120,1),dtype=np.uint8)
+    for y in np.arange(0,100):
+        for x in np.arange(0,120):
+            img[y,x,:] = (y*100+x)%255
+
+    #img = cv2.imread("../build/1584428668870.jpg")
+
+    h,w,c = img.shape
+    img = img.reshape(1,-1).tostring()
+    im = Image(height=h, width=w, channel=c, data = img)
     print("c x w x h->",im.channel, im.width, im.height)
-    print("im.data", im.data)
+    #print("im.data", im.data)
     print("im.data type->", type(im.data))
     
     result = client.Classify(im)

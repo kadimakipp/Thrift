@@ -34,6 +34,11 @@
 
 #include "classify.h"
 
+#ifdef IMageTest
+#include <opencv2/opencv.hpp>
+#else
+#include <opencv2/core.hpp>
+#endif
 using namespace std;
 using namespace apache::thrift;
 using namespace apache::thrift::concurrency;
@@ -72,9 +77,28 @@ public:
         cout<<"Run(Image)"<<std::endl;
         cout<<"Image info: c x w x h->";
         printf("%d x %d x %d\n", im.channel,im.width, im.height);
-        for(auto i: im.data)
-            std::cout<<"server->"<<int(i)<<std::endl;
-        
+        auto flag = CV_8UC3;
+        if(im.channel==1)
+        {
+            flag = CV_8UC1;
+        }
+        cv::Mat img = cv::Mat(im.height, im.width, flag, (void*)im.data.data());
+#ifdef IMageTest
+        cv::imwrite("recever.jpg", img);
+#else
+        for(int y=0;y<img.rows;y++)
+            for(int x=0;x<img.cols;x++)
+            {
+                auto value = (y*img.rows+x)%255;
+                if((img.at<cv::Vec3b>(y,x)[0] == value)&&
+                (img.at<cv::Vec3b>(y,x)[1] == value)&&
+                (img.at<cv::Vec3b>(y,x)[2] == value))
+                    std::cout<<"right"<<std::endl;
+                else{
+                    std::cout<<"error"<<std::endl;
+                }
+            }
+#endif
         Classification classes;
         classes.classes = std::vector<int16_t>(5,1);
         classes.probs = std::vector<double>(5, 0.01);

@@ -14,8 +14,8 @@ namespace py  shared
 struct Image{
     1: i16 height
     2: i16 width
-    3: i8 channel
-    4: list<i8> data
+    3: i16 channel
+    4: binary data
 }
 typedef list<i16> categories
 typedef list<double> probabilitise
