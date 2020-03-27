@@ -24,13 +24,17 @@ class classifyHandler:
         print("im.data type->", type(im.data))
         img = np.array(list(im.data)).astype(np.uint8).reshape(im.height, im.width, im.channel)
         # cv2.imwrite("recever.jpg", img)
-        for y in np.arange(0,100):
-            for x in np.arange(0,120):
-                value = (y*100+x)%255
+        flag = 0
+        for y in np.arange(0,im.height):
+            for x in np.arange(0,im.width):
+                value = (y*im.height+x)%255
                 if (img[y,x,:]==value).all():
-                    print("right")
-                else:
-                    print("error")
+                    flag=1
+        if flag:
+            print("right")
+        else:
+            print("error")
+                    
 
         log = SharedStruct()
         log.key = 0

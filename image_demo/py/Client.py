@@ -27,11 +27,13 @@ def main():
 
     # Connect!
     transport.open()
-
-    img = np.zeros((100,120,1),dtype=np.uint8)
-    for y in np.arange(0,100):
-        for x in np.arange(0,120):
-            img[y,x,:] = (y*100+x)%255
+    im_h = 1200
+    im_w = 1920
+    im_c = 3
+    img = np.zeros((im_h,im_w,im_c),dtype=np.uint8)
+    for y in np.arange(0,im_h):
+        for x in np.arange(0,im_w):
+            img[y,x,:] = (y*im_h+x)%255
 
     #img = cv2.imread("../build/1584428668870.jpg")
 
