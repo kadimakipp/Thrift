@@ -13,14 +13,14 @@ from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 import numpy as np
 import cv2
-
+from ktimer import Stopwatch
 class classifyHandler:
     def __init__(self):
         self.log = {}
 
     def Classify(self, im):
+        stopwatch = Stopwatch()
         print("c x w x h->",im.channel, im.width, im.height)
-        
         print("im.data type->", type(im.data))
         img = np.array(list(im.data)).astype(np.uint8).reshape(im.height, im.width, im.channel)
         # cv2.imwrite("recever.jpg", img)
@@ -35,12 +35,13 @@ class classifyHandler:
         else:
             print("error")
                     
-
         log = SharedStruct()
         log.key = 0
         log.value = 'err'
         self.log[1] = log
 
+        stopwatch.stop()
+        print("server time:", str(stopwatch))
         return Classification(classes=[1,2,3,4,5], probs=[0.1,0.2,0.3,0.4,0.5])
 
     def getStruct(self, key):

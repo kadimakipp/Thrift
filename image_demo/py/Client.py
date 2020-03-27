@@ -12,6 +12,7 @@ from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 import numpy as np
 import cv2
+from ktimer import Stopwatch
 def main():
     # Make socket
     transport = TSocket.TSocket('localhost', 9090)
@@ -25,8 +26,8 @@ def main():
     # Create a client to use the protocol encoder
     client = classify.Client(protocol)
 
-    # Connect!
-    transport.open()
+    stopwatch = Stopwatch()
+
     im_h = 1200
     im_w = 1920
     im_c = 3
@@ -34,7 +35,17 @@ def main():
     for y in np.arange(0,im_h):
         for x in np.arange(0,im_w):
             img[y,x,:] = (y*im_h+x)%255
+    
+    stopwatch.stop()
+    print("create image:", str(stopwatch))
+    stopwatch.restart()
+    
+    # Connect!
+    transport.open()
 
+    stopwatch.stop()
+    print("open sock:", str(stopwatch))
+    stopwatch.restart()
     #img = cv2.imread("../build/1584428668870.jpg")
 
     h,w,c = img.shape
@@ -43,8 +54,15 @@ def main():
     print("c x w x h->",im.channel, im.width, im.height)
     #print("im.data", im.data)
     print("im.data type->", type(im.data))
-    
+    stopwatch.stop()
+    print("memcpy:", str(stopwatch))
+    stopwatch.restart()
+
     result = client.Classify(im)
+    stopwatch.stop()
+    print("one epoch:", str(stopwatch))
+    stopwatch.restart()
+
     for r in result.classes:
         print("get->", r)
     for p in result.probs:
